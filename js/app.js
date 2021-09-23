@@ -11,7 +11,7 @@
 
     //Creamos la base de datos IndexDB Y abrimos una conexion con crm
     function crearDB(){
-        const crearDB = window.indexedDB.open('crm',1);
+        const crearDB = window.indexedDB.open('crm',2);
     
     //En caso que no se pueda crear o abrir xq el navegador no lo soporta
         crearDB.onerror = function(){
@@ -26,7 +26,7 @@
             const db = e.target.result;
 
             const objectStore = db.createObjectStore('crm', {
-                keypath:'id', autoincrement: true
+                keyPath:'id', autoincrement: true
             });
 
             objectStore.createIndex('nombre', 'nombre', {unique:false});
