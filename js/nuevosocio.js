@@ -16,7 +16,7 @@
 
     function conectarDB(){
         //Nos conectamos a crm    
-        const abrirConexion = window.indexedDB.open('crm',1);
+        const abrirConexion = window.indexedDB.open('crm',2);
 
         //Si la base de dato NO existe o hay un error
         abrirConexion.onerror = function(){
@@ -44,7 +44,38 @@
             imprimirAlerta('Todos los campos son obligatorios', 'error');
             return;
         }
+       //Crear un objeto
+        const socio = {
+            nombre,
+            email,
+            telefono,
+            documento
+        }
+        socio.id = Date.now();
+        
+        crearNuevoSocio(socio);
     }
+    
+    function crearNuevoSocio(socio){
+        const transaction = DB.transaction(['crm'], 'readwrite');
+
+        const objectStore = transaction.objectStore('crm');
+
+        objectStore.add(socio);
+
+        transaction.onerror = function(){
+            imprimirAlerta('Hubo un error', error);
+        };
+
+        transaction.onecomplete = function(){
+            imprimirAlerta('El cliente se agregó correctamente');
+
+            setTimeout(() =>{
+                window.location.href= 'index.html';
+            },3000);
+        }
+    }
+
 
     //Esta funcion tomara un mensaje y un tipo dependiendo el caso
     function imprimirAlerta(mensaje,tipo){
