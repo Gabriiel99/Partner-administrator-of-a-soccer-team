@@ -15,8 +15,8 @@
     });
 
     function conectarDB(){
-        //Nos conectamos a crm    
-        const abrirConexion = window.indexedDB.open('crm',2);
+        //Nos conectamos a db    
+        const abrirConexion = window.indexedDB.open('db',2);
 
         //Si la base de dato NO existe o hay un error
         abrirConexion.onerror = function(){
@@ -57,14 +57,14 @@
     }
     
     function crearNuevoSocio(socio){
-        const transaction = DB.transaction(['crm'], 'readwrite');
+        const transaction = DB.transaction(['db'], 'readwrite');
 
-        const objectStore = transaction.objectStore('crm');
+        const objectStore = transaction.objectStore('db');
 
         objectStore.add(socio);
 
         transaction.onerror = function(){
-            imprimirAlerta('Hubo un error', error);
+            imprimirAlerta('Hubo un error', 'error');
         };
 
         transaction.onecomplete = function(){

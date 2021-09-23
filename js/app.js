@@ -7,11 +7,16 @@
 //Una vez cargado el contenido mandamos a llamar a la funcion crearDB()
     document.addEventListener('DOMContentLoaded', () =>{
         crearDB();
+
+        //Esta funcion se ejecutara solo si existe la bd 
+        if(window.indexedDB.open('db',2)){
+            obtenerSocios();
+        }
     });
 
-    //Creamos la base de datos IndexDB Y abrimos una conexion con crm
+    //Creamos la base de datos IndexDB Y abrimos una conexion 
     function crearDB(){
-        const crearDB = window.indexedDB.open('crm',2);
+        const crearDB = window.indexedDB.open('db',2);
     
     //En caso que no se pueda crear o abrir xq el navegador no lo soporta
         crearDB.onerror = function(){
@@ -25,7 +30,7 @@
         crearDB.onupgradeneeded = function(e){
             const db = e.target.result;
 
-            const objectStore = db.createObjectStore('crm', {
+            const objectStore = db.createObjectStore('db', {
                 keyPath:'id', autoincrement: true
             });
 
@@ -38,4 +43,53 @@
             console.log('DB LISTA Y CREADA');
         }
     }
+
+    function obtenerSocios(){
+
+        //abrimos la conexion
+        const abrirConexion = window.indexedDB.open('db',2);
+
+        abrirConexion.onerror = function(){
+            console.log('ERROR');
+        };
+
+        abrirConexion.onsuccess = function(){
+            DB = abrirConexion.result;
+
+            const objectStore = DB.transaction('db').objectStore('db');
+
+            objectStore.openCursor().onsuccess = function(e){
+                const cursor = e.target.result;
+
+                if(cursor){
+                    const{nombre, email, telefono, documento, id} = cursor.value;
+
+                    const listadoSocios = document.querySelector('#listado-socios');
+                    listadoSocios.innerHTML += ` 
+                    <tr>
+                        <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                            <p class="text-sm leading-5 font-medium text-gray-700 text-lg  font-bold"> ${nombre} </p>
+                            <p class="text-sm leading-10 text-gray-700"> ${email} </p>
+                        </td>
+                        <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 ">
+                            <p class="text-gray-700">${telefono}</p>
+                        </td>
+                        <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200  leading-5 text-gray-700">    
+                            <p class="text-gray-600">${documento}</p>
+                        </td>
+                        <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5">
+                            <a href="editar-cliente.html?id=${id}" class="text-teal-600 hover:text-teal-900 mr-5">Editar</a>
+                            <a href="#" data-cliente="${id}" class="text-red-600 hover:text-red-900">Eliminar</a>
+                        </td>
+                    </tr>
+                `;
+
+                    cursor.continue();
+                }else{
+                    console.log('No hay mas registros...');
+                }
+            }
+        }
+    }
+
 })();
