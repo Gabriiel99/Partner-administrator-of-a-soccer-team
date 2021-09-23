@@ -3,3 +3,4 @@
 So far we are adding:
 * DataBase
 * Partner validation
+* New clients 
