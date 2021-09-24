@@ -49,22 +49,29 @@
         //abrimos la conexion
         const abrirConexion = window.indexedDB.open('db',2);
 
+        //Si hubo un error
         abrirConexion.onerror = function(){
             console.log('ERROR');
         };
 
+        //Si fue correcto
         abrirConexion.onsuccess = function(){
             DB = abrirConexion.result;
 
+            //Accedemos al objectStore
             const objectStore = DB.transaction('db').objectStore('db');
 
+            //Utilizamos cursor
             objectStore.openCursor().onsuccess = function(e){
                 const cursor = e.target.result;
 
                 if(cursor){
+                    //Extraemos estos valores con destructuring
                     const{nombre, email, telefono, documento, id} = cursor.value;
 
+                    //Seleecionamos la tabla
                     const listadoSocios = document.querySelector('#listado-socios');
+                    //Colocamos y mostramos todos los registros en la tabla
                     listadoSocios.innerHTML += ` 
                     <tr>
                         <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
@@ -78,12 +85,12 @@
                             <p class="text-gray-600">${documento}</p>
                         </td>
                         <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5">
-                            <a href="editar-cliente.html?id=${id}" class="text-teal-600 hover:text-teal-900 mr-5">Editar</a>
-                            <a href="#" data-cliente="${id}" class="text-red-600 hover:text-red-900">Eliminar</a>
+                            <a href="editar-socio.html?id=${id}" class="text-teal-600 hover:text-teal-900 mr-5">Editar</a>
+                            <a href="#" data-socio="${id}" class="text-red-600 hover:text-red-900">Eliminar</a>
                         </td>
                     </tr>
                 `;
-
+                //Traer a los siguientes socios
                     cursor.continue();
                 }else{
                     console.log('No hay mas registros...');
