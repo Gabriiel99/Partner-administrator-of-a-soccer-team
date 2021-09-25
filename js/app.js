@@ -4,6 +4,8 @@
 
     let DB;
 
+    const listadoSocios = document.querySelector('#listado-socios');
+
 //Una vez cargado el contenido mandamos a llamar a la funcion crearDB()
     document.addEventListener('DOMContentLoaded', () =>{
         crearDB();
@@ -12,7 +14,34 @@
         if(window.indexedDB.open('db',2)){
             obtenerSocios();
         }
+
+        listadoSocios.addEventListener('click', eliminarRegistro);
     });
+
+    function eliminarRegistro(e){
+        if(e.target.classList.contains('eliminar')){
+            const idEliminar = Number (e.target.dataset.socio);
+
+            const confirmar = confirm('Desea eliminar este cliente?');
+
+            if(confirmar){
+                const transaction = DB.transaction(['db'], 'readwrite');
+                const objectStore = transaction.objectStore('db');
+
+                objectStore.delete(idEliminar);
+
+                transaction.oncomplete = function (){
+                    console.log('Eliminando');
+
+                    e.target.parentElemente.remove();
+                };
+
+                transaction.onerror = function(){
+                    console.log('error');
+                }
+            }
+        }
+    }
 
     //Creamos la base de datos IndexDB Y abrimos una conexion 
     function crearDB(){
@@ -68,9 +97,7 @@
                 if(cursor){
                     //Extraemos estos valores con destructuring
                     const{nombre, email, telefono, documento, id} = cursor.value;
-
-                    //Seleecionamos la tabla
-                    const listadoSocios = document.querySelector('#listado-socios');
+                    
                     //Colocamos y mostramos todos los registros en la tabla
                     listadoSocios.innerHTML += ` 
                     <tr>
@@ -86,7 +113,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5">
                             <a href="editar-socio.html?id=${id}" class="text-teal-600 hover:text-teal-900 mr-5">Editar</a>
-                            <a href="#" data-socio="${id}" class="text-red-600 hover:text-red-900">Eliminar</a>
+                            <a href="#" data-socio="${id}" class="text-red-600 hover:text-red-900 eliminar">Eliminar</a>
                         </td>
                     </tr>
                 `;
